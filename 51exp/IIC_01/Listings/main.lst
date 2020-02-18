@@ -1,0 +1,273 @@
+C51 COMPILER V9.54   MAIN                                                                  02/09/2020 19:01:08 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Study\mdk.5.24a\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listi
+                    -ngs\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include<reg51.h>
+   2          #include<intrins.h>
+   3          
+   4          #define uint unsigned int
+   5          #define uchar unsigned char
+   6            
+   7          #define At24c02ADDR 0xA0
+   8          #define I2cRead 1
+   9          #define I2cWrite 0
+  10          
+  11          sbit DU = P2^6;//段选
+  12          sbit WE = P2^7;//位选
+  13          
+  14          sbit SCL = P2^1;
+  15          sbit SDA = P2^0;
+  16          
+  17          bit AckFlag;
+  18          uchar mSec,Sec;
+  19          
+  20          
+  21          uchar code SMGduan[]=
+  22          { 0x3f,0x06,0x5b,0x4f,
+  23            0x66,0x6d,0x7d,0x07,
+  24            0x7f,0x6f,0x77,0x7c,
+  25            0x39,0x5e,0x79,0x71
+  26          };
+  27          //数码管段选
+  28          uchar code SMGwei[]=
+  29          {
+  30            0xFE,0xFD,0xFB
+  31          };
+  32          //数码管位选
+  33          
+  34          void delay(uint z)
+  35          {
+  36   1          uint x,y;
+  37   1          for(x=z;x>0;x--)
+  38   1        {
+  39   2          for(y=144;y>0;y--);
+  40   2        }
+  41   1      }
+  42          
+  43          void display(uchar i)
+  44          {
+  45   1         static uchar wei;
+  46   1        
+  47   1        P0=0xFF;//清楚段码
+  48   1        WE=1;
+  49   1        P0=SMGwei[wei];
+  50   1        WE=0;
+  51   1        switch(wei)
+  52   1          {case 0: DU=1;P0=SMGduan[i/100];DU=0;break;
+  53   2           case 1: DU=1;P0=SMGduan[i%100/10];DU=0;break;
+  54   2           case 2: DU=1;P0=SMGduan[i%10];DU=0;break;
+C51 COMPILER V9.54   MAIN                                                                  02/09/2020 19:01:08 PAGE 2   
+
+  55   2        
+  56   2        }
+  57   1        wei++;
+  58   1        if(wei==3)
+  59   1        {wei=0;}
+  60   1      }
+  61          
+  62          
+  63          void timer0Init()
+  64          {
+  65   1        EA=1;
+  66   1        ET0=1;//定时器0的中断允许位
+  67   1        TR0 =1;//启动定时器0
+  68   1        TMOD =0x01;
+  69   1        TH0 = 0xed; 
+  70   1        TL0 = 0xfe;//定时50ms
+  71   1      
+  72   1      }
+  73          /****************
+  74          IIC通信
+  75          *****************/
+  76          void delay5us()
+  77          {
+  78   1         _nop_();//在intrins.h里，执行一次约5us，表示空循环一个机器指令的时间
+  79   1      }
+  80          
+  81          void I2cStart()
+  82          {
+  83   1        SCL=1;
+  84   1        SDA=1;
+  85   1        delay5us();
+  86   1        SDA=0;
+  87   1        delay5us();
+  88   1        
+  89   1      }
+  90          
+  91          void I2cStop()
+  92          {
+  93   1        SCL=0;
+  94   1        SDA=0;
+  95   1        SCL=1;
+  96   1        delay5us();
+  97   1        SDA=1;
+  98   1        delay5us();
+  99   1      
+ 100   1      }
+ 101          
+ 102          /****主机读从机应答***/
+ 103          bit ReadACK()
+ 104          {
+ 105   1          SCL =1;
+ 106   1          delay5us();
+ 107   1          if(SDA==1)
+ 108   1          {
+ 109   2            SCL=0;
+ 110   2            return(1);//非应答
+ 111   2          }
+ 112   1          else
+ 113   1          {
+ 114   2            SCL=0;
+ 115   2            return(0);//应答  
+ 116   2          }
+C51 COMPILER V9.54   MAIN                                                                  02/09/2020 19:01:08 PAGE 3   
+
+ 117   1      
+ 118   1      }
+ 119          
+ 120          /*****主机发送应答*****/
+ 121          void SendACK(bit i)
+ 122          {
+ 123   1        SCL=0;
+ 124   1        if(i==1)
+ 125   1          SDA =1;
+ 126   1        if(i==0)
+ 127   1          SDA =0;
+ 128   1        SCL=1;
+ 129   1        delay5us();
+ 130   1        SCL=0;
+ 131   1        SDA=1;//释放数据总线
+ 132   1        
+ 133   1      }
+ 134          //
+ 135          void I2cSendByte(uchar DAT)
+ 136          {  
+ 137   1         uchar i;
+ 138   1         for(i=0;i<8;i++)
+ 139   1        {
+ 140   2         SCL = 0;
+ 141   2         if(DAT & 0x80)//&运算符
+ 142   2           SDA=1;
+ 143   2         else
+ 144   2           SDA=0;
+ 145   2         SCL=1;
+ 146   2         DAT<<=1;//左移一位，最高位移除，最低位补0
+ 147   2        }
+ 148   1         SCL=0;
+ 149   1         SDA=1;
+ 150   1        
+ 151   1      }
+ 152            
+ 153          
+ 154          //地址1010+000
+ 155          void At24c02Write(uchar ADDR,uchar DAT)
+ 156          {
+ 157   1         I2cStart();
+ 158   1         I2cSendByte(0xA0 + 0);
+ 159   1         if(ReadACK())
+ 160   1           AckFlag=1;   //无应答
+ 161   1         else
+ 162   1           AckFlag=0;
+ 163   1         
+ 164   1         I2cSendByte(ADDR);//存储区的地址
+ 165   1         if(ReadACK())
+ 166   1           AckFlag=1;   //无应答
+ 167   1         else
+ 168   1           AckFlag=0;
+ 169   1         
+ 170   1         I2cSendByte(DAT);
+ 171   1         if(ReadACK())
+ 172   1           AckFlag=1;   //无应答
+ 173   1         else
+ 174   1           AckFlag=0;
+ 175   1         
+ 176   1         I2cStop();
+ 177   1      }
+ 178          
+C51 COMPILER V9.54   MAIN                                                                  02/09/2020 19:01:08 PAGE 4   
+
+ 179          //接收一个字节的函数
+ 180          uchar I2cReadByte()
+ 181          {
+ 182   1        uchar i,DAT;
+ 183   1        
+ 184   1        for(i=0;i<8;i++)
+ 185   1        {
+ 186   2          DAT<<=1;
+ 187   2          SCL = 0;
+ 188   2          SCL = 1;
+ 189   2          if(SDA)
+ 190   2            DAT |=0x01 ;  //把接受的从机数据存在DAT中
+ 191   2        }
+ 192   1        
+ 193   1        return(DAT);
+ 194   1      }
+ 195            
+ 196          uchar At24c02Read(uchar ADDR)
+ 197          {  
+ 198   1         uchar DAT;
+ 199   1         I2cStart();
+ 200   1         I2cSendByte(At24c02ADDR + I2cWrite);
+ 201   1         if(ReadACK())
+ 202   1           AckFlag=1;   //无应答
+ 203   1         else
+ 204   1           AckFlag=0;
+ 205   1         I2cSendByte(ADDR);//存储区的地址
+ 206   1         ReadACK();
+ 207   1         I2cStart();
+ 208   1         I2cSendByte(At24c02ADDR + I2cRead);
+ 209   1         if(ReadACK())
+ 210   1           AckFlag=1;   //无应答
+ 211   1         else
+ 212   1           AckFlag=0;
+ 213   1         DAT=I2cReadByte();
+ 214   1         SendACK(1);
+ 215   1         I2cStop();
+ 216   1         return(DAT);
+ 217   1      }
+ 218          
+ 219          void main()
+ 220          { timer0Init();  
+ 221   1        EA=0;//屏蔽中断
+ 222   1        At24c02Write(2,9);
+ 223   1        delay(1);
+ 224   1        Sec = At24c02Read(2);
+ 225   1        EA=1;
+ 226   1        while(1);
+ 227   1        
+ 228   1      }
+ 229          
+ 230          void timer0() interrupt 1
+ 231          {
+ 232   1        TH0 = 0xed; 
+ 233   1        TL0 = 0xfe;//定时5ms
+ 234   1      //  mSec++;
+ 235   1      //  if(mSec == 200)
+ 236   1      //  {
+ 237   1      //     mSec =0;
+ 238   1      //    Sec++;
+ 239   1      //  }
+ 240   1        display(Sec); 
+C51 COMPILER V9.54   MAIN                                                                  02/09/2020 19:01:08 PAGE 5   
+
+ 241   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    417    ----
+   CONSTANT SIZE    =     19    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
