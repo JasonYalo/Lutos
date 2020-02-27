@@ -1,0 +1,25 @@
+--cpu Cortex-M7.fp.sp --fpu=FPv4-SP
+"..\stm32f7xx_hal_cortex.o"
+"..\stm32f7xx_hal_rcc.o"
+"..\stm32f7xx_hal_flash_ex.o"
+"..\stm32f7xx_hal_flash.o"
+"..\stm32f7xx_hal_i2c.o"
+"..\stm32f7xx_hal_pwr.o"
+"..\stm32f7xx_hal_dma.o"
+"..\stm32f7xx_hal_gpio.o"
+"..\stm32f7xx_hal_rcc_ex.o"
+"..\stm32f7xx_hal_dma_ex.o"
+"..\stm32f7xx_hal_i2c_ex.o"
+"..\stm32f7xx_hal.o"
+"..\stm32f7xx_hal_tim.o"
+"..\stm32f7xx_hal_tim_ex.o"
+"..\stm32f7xx_hal_pwr_ex.o"
+"..\stm32f7xx_it.o"
+"..\main.o"
+"..\stm32f7xx_hal_msp.o"
+"..\startup_stm32f767xx.o"
+"..\system_stm32f7xx.o"
+--library_type=microlib --strict --scatter "..\Led_Template.sct"
+--diag_suppress=L6329 --summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "Led_Template.map" -o ..\Led_Template.axf
