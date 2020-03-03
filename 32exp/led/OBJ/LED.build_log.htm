@@ -1,0 +1,66 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: ¦ÌVision V5.14.2
+Copyright (C) 2015 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: mmmf m, asd, LIC=UB4Y8-3HTQD-58MFB-2LCWX-3ETBU-CCH47
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Professional  Version: 5.24.1
+Toolchain Path:  D:\Study\mdk.5.24a\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 5 (build 528)
+Assembler:       Armasm.exe V5.06 update 5 (build 528)
+Linker/Locator:  ArmLink.exe V5.06 update 5 (build 528)
+Library Manager: ArmAr.exe V5.06 update 5 (build 528)
+Hex Converter:   FromElf.exe V5.06 update 5 (build 528)
+CPU DLL:         SARMCM3.DLL V5.24.1
+Dialog DLL:      DCM.DLL V1.16.0.0
+Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.1.0
+Dialog DLL:      TCM.DLL V1.32.0.0
+ 
+<h2>Project:</h2>
+D:\Study\32exp\led\USER\LED.uvprojx
+Project File Date:  03/02/2020
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 5 (build 528)', folder: 'D:\Study\mdk.5.24a\ARM\ARMCC\Bin'
+Build target 'LED'
+compiling led.c...
+..\HARDWARE\led\led.c(6): error:  #20: identifier "GPIO_InitTypeDef" is undefined
+    GPIO_InitTypeDef GPIO_Initure;
+..\HARDWARE\led\led.c(7): error:  #20: identifier "__HAL_RCC_GPIOB_CLK_ENABLE" is undefined
+        __HAL_RCC_GPIOB_CLK_ENABLE;//¿ªÆôgpiobÊ±ÖÓ
+..\HARDWARE\led\led.c(9): error:  #20: identifier "GPIO_PIN_0" is undefined
+        GPIO_Initure.Pin=GPIO_PIN_0|GPIO_PIN_1;
+..\HARDWARE\led\led.c(9): error:  #20: identifier "GPIO_PIN_1" is undefined
+        GPIO_Initure.Pin=GPIO_PIN_0|GPIO_PIN_1;
+..\HARDWARE\led\led.c(10): error:  #20: identifier "GPIO_OUTPUT_PP" is undefined
+        GPIO_Initure.Mode=GPIO_OUTPUT_PP;
+..\HARDWARE\led\led.c(11): error:  #20: identifier "GPIO_PULLUP" is undefined
+        GPIO_Initure.Pull=GPIO_PULLUP;
+..\HARDWARE\led\led.c(12): error:  #20: identifier "GPIO_SPEED_HIGH" is undefined
+        GPIO_Initure.Speed=GPIO_SPEED_HIGH;
+..\HARDWARE\led\led.c(14): warning:  #223-D: function "HAL_GPIO_Init" declared implicitly
+        HAL_GPIO_Init(GPIOB,&GPIO_Initure);
+..\HARDWARE\led\led.c(14): error:  #20: identifier "GPIOB" is undefined
+        HAL_GPIO_Init(GPIOB,&GPIO_Initure);
+..\HARDWARE\led\led.c(16): warning:  #223-D: function "HAL_GPIO_WritePin" declared implicitly
+        HAL_GPIO_WritePin(GPIOB,GPIO_PIN_0,GPIO_PIN_SET);
+..\HARDWARE\led\led.c(16): error:  #20: identifier "GPIO_PIN_SET" is undefined
+        HAL_GPIO_WritePin(GPIOB,GPIO_PIN_0,GPIO_PIN_SET);
+..\HARDWARE\led\led.c(21): warning:  #1-D: last line of file ends without a newline
+  }
+..\HARDWARE\led\led.c: 3 warnings, 9 errors
+"..\OBJ\LED.axf" - 9 Error(s), 3 Warning(s).
+
+<h2>Collection of Component include folders:</h2>
+  D:\Study\32exp\led\USER\RTE
+  D:\Study\mdk.5.24a\ARM\PACK\Keil\STM32F7xx_DFP\2.7.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include
+
+<h2>Collection of Component Files used:</h2>
+Target not created.
+</pre>
+</body>
+</html>
